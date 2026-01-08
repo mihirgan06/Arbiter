@@ -46,16 +46,14 @@ export function MarketCard({ market, index }: { market: Market; index: number })
             <span className="text-zinc-500 w-20 truncate">{platform.name}</span>
             <div className="flex items-center gap-4 font-mono">
               <span
-                className={`w-12 text-right ${
-                  platform.yesOdds === bestYes ? "text-positive font-medium" : "text-zinc-400"
-                }`}
+                className={`w-12 text-right ${platform.yesOdds === bestYes ? "text-positive font-medium" : "text-zinc-400"
+                  }`}
               >
                 {platform.yesOdds}¢
               </span>
               <span
-                className={`w-12 text-right ${
-                  platform.noOdds === bestNo ? "text-negative font-medium" : "text-zinc-400"
-                }`}
+                className={`w-12 text-right ${platform.noOdds === bestNo ? "text-negative font-medium" : "text-zinc-400"
+                  }`}
               >
                 {platform.noOdds}¢
               </span>
