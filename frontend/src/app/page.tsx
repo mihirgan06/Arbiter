@@ -1,7 +1,6 @@
 import { MarketCard } from "@/components/MarketCard";
 import { Header } from "@/components/Header";
 
-// Mock data - replace with real API calls
 const markets = [
   {
     id: "1",
