@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Normalized market event that can exist across multiple platforms
+model Event {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String?
+  category    String
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  markets     Market[]
+  newsItems   NewsItem[]
+  discrepancies Discrepancy[]
+}
+
+// Individual market on a specific platform
+model Market {
+  id              String   @id @default(cuid())
+  eventId         String
+  platform        Platform
+  externalId      String
+  question        String
+  yesProbability  Float
+  noProbability   Float
+  volume          Float?
+  liquidity       Float?
+  lastUpdated     DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  event           Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  snapshots       MarketSnapshot[]
+
+  @@unique([platform, externalId])
+  @@index([eventId])
+}
+
+// Historical snapshots for tracking price movements
+model MarketSnapshot {
+  id             String   @id @default(cuid())
+  marketId       String
+  yesProbability Float
+  noProbability  Float
+  volume         Float?
+  timestamp      DateTime @default(now())
+
+  market         Market   @relation(fields: [marketId], references: [id], onDelete: Cascade)
+
+  @@index([marketId, timestamp])
+}
+
+// News articles correlated with events
+model NewsItem {
+  id          String   @id @default(cuid())
+  eventId     String
+  title       String
+  description String?
+  url         String
+  source      String
+  publishedAt DateTime
+  sentiment   Float?    // -1 to 1
+  relevance   Float?    // 0 to 1 confidence score
+  createdAt   DateTime @default(now())
+
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, publishedAt])
+}
+
+// Detected discrepancies between markets
+model Discrepancy {
+  id              String   @id @default(cuid())
+  eventId         String
+  platform1       Platform
+  platform2       Platform
+  probability1    Float
+  probability2    Float
+  spread          Float    // Absolute difference
+  spreadPercent   Float    // Percentage difference
+  liquidity1      Float?
+  liquidity2      Float?
+  confidence      Float    // How confident we are this is a real opportunity
+  status          DiscrepancyStatus @default(ACTIVE)
+  detectedAt      DateTime @default(now())
+  resolvedAt      DateTime?
+
+  event           Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@index([eventId, detectedAt])
+  @@index([status])
+}
+
+enum Platform {
+  POLYMARKET
+  KALSHI
+  PREDICTIT
+  METACULUS
+}
+
+enum DiscrepancyStatus {
+  ACTIVE
+  RESOLVED
+  EXPIRED
+}
