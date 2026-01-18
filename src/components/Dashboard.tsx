@@ -5,6 +5,7 @@ import { Header } from "./Header";
 import { StatsOverview } from "./StatsOverview";
 import { DiscrepancyAlert } from "./DiscrepancyAlert";
 import { MarketCard } from "./MarketCard";
+import { ExecutionSimulator } from "./ExecutionSimulator";
 import type { DashboardEvent, DiscrepancyResult } from "@/lib/types";
 
 interface DashboardData {
@@ -77,6 +78,9 @@ export function Dashboard() {
       <Header stats={data.stats} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Execution Simulator - Real-time trade analysis */}
+        <ExecutionSimulator />
+        
         <StatsOverview stats={data.stats} />
         
         <DiscrepancyAlert discrepancies={data.discrepancies} />
